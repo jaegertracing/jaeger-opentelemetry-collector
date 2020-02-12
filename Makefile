@@ -32,4 +32,4 @@ check:
 install-tools:
 	${GO_FLAGS} go install \
 		golang.org/x/lint/golint \
-		github.com/securego/gosec/cmd/gosec
+		golang.org/x/tools/cmd/goimports
