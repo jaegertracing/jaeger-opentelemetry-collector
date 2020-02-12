@@ -15,18 +15,16 @@ ci: check test
 
 .PHONY: format
 format:
-	@${GOPATH}/bin/goimports -local "github.com/jaegertracing/jaeger-opentelemetry-collector" -l -w $(shell git ls-files "*\.go" | grep -v vendor)
+	@${GOPATH}/bin/goimports -local "github.com/jaegertracing/jaeger-opentelemetry-collector" -l -w $(shell git ls-files "*\.go" | grep -v vendor) > ${FMT_LOG}
+	@[ ! -s "$(FMT_LOG)" ] || (echo "Formatting:" | cat - $(FMT_LOG))
 
 .PHONY: lint
 lint:
-	@${GOPATH}/bin/golint -set_exit_status ./...
+	@${GOPATH}/bin/golint ./... > ${LINT_LOG}
+	@[ ! -s "$(LINT_LOG)" ] || (echo "Lint issues found in:" | cat - $(LINT_LOG) && false)
 
 .PHONY: check
-check:
-	$(shell make format > ${FMT_LOG})
-	$(shell make lint > ${LINT_LOG})
-	@[ ! -s "$(FMT_LOG)" ] || (echo "Go fmt, code style or import ordering failures, run 'make format'" | cat - $(FMT_LOG) && false)
-	@[ ! -s "$(LINT_LOG)" ] || (echo "Go lint failures:" | cat - $(LINT_LOG) && false)
+check: format lint
 
 .PHONY: install-tools
 install-tools:
