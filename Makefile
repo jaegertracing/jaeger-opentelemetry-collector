@@ -44,4 +44,3 @@ build:
 .PHONY: docker
 docker:
 	docker build . --file cmd/collector/Dockerfile -t $(DOCKER_NAMESPACE)/$(COLLECTOR_NAME):$(DOCKER_TAG)
-	${GO_FLAGS} go build -o ./cmd/collector/$(COLLECTOR_NAME) ./cmd/collector/main.go
