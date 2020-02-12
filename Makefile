@@ -3,6 +3,9 @@ GO_FLAGS ?= GOOS=linux GOARCH=amd64 CGO_ENABLED=0 GO111MODULE=on
 FMT_LOG=fmt.log
 LINT_LOG=lint.log
 GOPATH ?= "$(HOME)/go"
+COLLECTOR_NAME ?= jaeger-opentelemetry-collector
+DOCKER_NAMESPACE?=jaegertracing
+DOCKER_TAG?=latest
 
 .DEFAULT_GOAL := test
 
@@ -31,3 +34,14 @@ install-tools:
 	${GO_FLAGS} go install \
 		golang.org/x/lint/golint \
 		golang.org/x/tools/cmd/goimports
+
+################## Build
+
+.PHONY: build
+build:
+	${GO_FLAGS} go build -o ./cmd/collector/$(COLLECTOR_NAME) cmd/collector/main.go
+
+.PHONY: docker
+docker:
+	docker build . --file cmd/collector/Dockerfile -t $(DOCKER_NAMESPACE)/$(COLLECTOR_NAME):$(DOCKER_TAG)
+	${GO_FLAGS} go build -o ./cmd/collector/$(COLLECTOR_NAME) ./cmd/collector/main.go
