@@ -4,6 +4,8 @@
 
 Experimental Jaeger OpenTelemetry Collector.
 
+test DCO
+
 ## License
   
 [Apache 2.0 License](./LICENSE).
