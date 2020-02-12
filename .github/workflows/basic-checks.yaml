@@ -9,6 +9,8 @@ jobs:
       with:
         go-version: '1.13.3'
     - uses: actions/checkout@v1
+    - name: "make install-tools"
+      run: make install-tools
     - name: "make ci"
       run: make ci
 

@@ -28,7 +28,6 @@ check:
 	@[ ! -s "$(FMT_LOG)" ] || (echo "Go fmt, code style or import ordering failures, run 'make format'" | cat - $(FMT_LOG) && false)
 	@[ ! -s "$(LINT_LOG)" ] || (echo "Go lint failures:" | cat - $(LINT_LOG) && false)
 
-
 .PHONY: install-tools
 install-tools:
 	${GO_FLAGS} go install \
