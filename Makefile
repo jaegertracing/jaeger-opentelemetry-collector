@@ -4,8 +4,8 @@ FMT_LOG=fmt.log
 LINT_LOG=lint.log
 GOPATH ?= "$(HOME)/go"
 COLLECTOR_NAME ?= jaeger-opentelemetry-collector
-DOCKER_NAMESPACE?=jaegertracing
-DOCKER_TAG?=latest
+DOCKER_NAMESPACE ?= quay.io/jaegertracing
+DOCKER_TAG ?= latest
 
 .DEFAULT_GOAL := test
 
