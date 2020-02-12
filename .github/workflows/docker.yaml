@@ -1,5 +1,6 @@
-on: [push]
-name: Build Docker image
+name: "Test building docker image"
+on: [push, pull_request]
+
 jobs:
   build-docker:
     runs-on: ubuntu-latest
