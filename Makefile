@@ -1,8 +1,8 @@
 UNIT_TEST_PACKAGES := $(shell go list ./pkg/...)
 GO_FLAGS ?= GOOS=linux GOARCH=amd64 CGO_ENABLED=0 GO111MODULE=on
-GOLINT=golint
 FMT_LOG=fmt.log
 LINT_LOG=lint.log
+GOPATH ?= "$(HOME)/go"
 
 .DEFAULT_GOAL := test
 
@@ -19,7 +19,7 @@ format:
 
 .PHONY: lint
 lint:
-	@${GOLINT} ./...
+	@${GOPATH}/bin/golint -set_exit_status ./...
 
 .PHONY: check
 check:
