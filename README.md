@@ -2,7 +2,8 @@
 
 # Jaeger OpenTelemetry Collector
 
-Experimental Jaeger OpenTelemetry Collector.
+Experimental Jaeger OpenTelemetry Collector. This component builds on top of [OpenTelemetry-collector](https://github.com/open-telemetry/opentelemetry-collector)
+and adds support for Jaeger storage implementations. Hence this collector is able to write received data directly to storage.
 
 ## License
   
