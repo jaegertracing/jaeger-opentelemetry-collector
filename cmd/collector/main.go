@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 
+	"github.com/jaegertracing/jaeger-opentelemetry-collector/pkg/exporter/elasticsearch"
+
 	"github.com/open-telemetry/opentelemetry-collector/defaults"
 	"github.com/open-telemetry/opentelemetry-collector/service"
 )
@@ -24,6 +26,9 @@ func main() {
 
 	cmpts, err := defaults.Components()
 	handleErr(err)
+
+	es := elasticsearch.Factory{}
+	cmpts.Exporters[es.Type()] = es
 
 	svc, err := service.New(cmpts, info)
 	handleErr(err)

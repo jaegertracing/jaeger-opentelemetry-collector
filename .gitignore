@@ -18,5 +18,5 @@ fmt.log
 lint.log
 cover.out
 
-config.yaml
+/config.yaml
 cmd/collector/jaeger-opentelemetry-collector
