@@ -43,7 +43,6 @@ func (Factory) CreateTraceExporter(log *zap.Logger, cfg configmodels.Exporter) (
 	if !ok {
 		return nil, fmt.Errorf("could not cast configuration to %s", typeStr)
 	}
-	//applyDefaults(esCfg)
 	return New(esCfg, log)
 }
 
