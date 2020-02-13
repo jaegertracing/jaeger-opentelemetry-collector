@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/open-telemetry/opentelemetry-collector/consumer/consumererror"
+
 	eswrapper "github.com/jaegertracing/jaeger/pkg/es/wrapper"
 	"github.com/jaegertracing/jaeger/plugin/storage/es"
 	esSpanStore "github.com/jaegertracing/jaeger/plugin/storage/es/spanstore"
@@ -85,7 +87,7 @@ type storage struct {
 func (s *storage) store(ctx context.Context, td consumerdata.TraceData) (droppedSpans int, err error) {
 	protoBatch, err := jaegertranslator.OCProtoToJaegerProto(td)
 	if err != nil {
-		return len(td.Spans), err
+		return len(td.Spans), consumererror.Permanent(err)
 	}
 	dropped := 0
 	for _, span := range protoBatch.Spans {
