@@ -5,14 +5,13 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/open-telemetry/opentelemetry-collector/consumer/consumererror"
-
 	eswrapper "github.com/jaegertracing/jaeger/pkg/es/wrapper"
 	"github.com/jaegertracing/jaeger/plugin/storage/es"
 	esSpanStore "github.com/jaegertracing/jaeger/plugin/storage/es/spanstore"
 	"github.com/jaegertracing/jaeger/storage/spanstore"
 	"github.com/olivere/elastic"
 	"github.com/open-telemetry/opentelemetry-collector/consumer/consumerdata"
+	"github.com/open-telemetry/opentelemetry-collector/consumer/consumererror"
 	"github.com/open-telemetry/opentelemetry-collector/exporter"
 	"github.com/open-telemetry/opentelemetry-collector/exporter/exporterhelper"
 	jaegertranslator "github.com/open-telemetry/opentelemetry-collector/translator/trace/jaeger"
@@ -29,8 +28,12 @@ func New(config *Config, log *zap.Logger) (exporter.TraceExporter, error) {
 	if err != nil {
 		return nil, err
 	}
-	// TODO bulk parameters
-	bulk, err := esRawClient.BulkProcessor().Do(context.Background())
+	bulk, err := esRawClient.BulkProcessor().
+		BulkActions(config.BulkActions).
+		BulkSize(config.BulkSize).
+		Workers(config.BulkWorkers).
+		FlushInterval(config.BulkFlushInterval).
+		Do(context.Background())
 	if err != nil {
 		return nil, err
 	}

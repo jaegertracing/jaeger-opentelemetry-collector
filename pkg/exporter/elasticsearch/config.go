@@ -1,6 +1,8 @@
 package elasticsearch
 
 import (
+	"time"
+
 	"github.com/open-telemetry/opentelemetry-collector/config/configmodels"
 )
 
@@ -19,4 +21,12 @@ type Config struct {
 	CreateTemplates bool `mapstructure:"create_mappings"`
 	// IndexPrefix defines options prefix of Jaeger indices. For example "production" creates "production-jaeger-*"
 	IndexPrefix string `mapstructure:"index_prefix"`
+	// BulkActions defines the number of requests that can be enqueued before the bulk processor decides to commit.
+	BulkActions int `mapstructure:"bulk_actions"`
+	// BulkFlushInterval defines duration after which bulk requests are committed, regardless of other thresholds.
+	BulkFlushInterval time.Duration `mapstructure:"bulk_flush_interval"`
+	// BulkSize defines the number of bytes that the bulk requests can take up before the bulk processor decides to commit.
+	BulkSize int `mapstructure:"bulk_size"`
+	// BulkWorkers define the number of workers that are able to receive bulk requests and eventually commit them to Elasticsearch.
+	BulkWorkers int `mapstructure:"bulk_workers"`
 }
