@@ -39,10 +39,10 @@ func (Factory) CreateDefaultConfig() configmodels.Exporter {
 		Replicas:          defaultReplicas,
 		Shards:            defaultShards,
 		CreateTemplates:   defaultCreateTemplate,
-		BulkActions:       defaultBulkActions,
-		BulkSize:          defaultBulkSizeBytes,
-		BulkWorkers:       defaultBulkWorkers,
-		BulkFlushInterval: defaultBulkFlushInterval,
+		bulkActions:       defaultBulkActions,
+		bulkSize:          defaultBulkSizeBytes,
+		bulkWorkers:       defaultBulkWorkers,
+		bulkFlushInterval: defaultBulkFlushInterval,
 	}
 }
 

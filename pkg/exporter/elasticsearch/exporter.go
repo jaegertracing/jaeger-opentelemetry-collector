@@ -29,10 +29,10 @@ func New(config *Config, log *zap.Logger) (exporter.TraceExporter, error) {
 		return nil, err
 	}
 	bulk, err := esRawClient.BulkProcessor().
-		BulkActions(config.BulkActions).
-		BulkSize(config.BulkSize).
-		Workers(config.BulkWorkers).
-		FlushInterval(config.BulkFlushInterval).
+		BulkActions(config.bulkActions).
+		BulkSize(config.bulkSize).
+		Workers(config.bulkWorkers).
+		FlushInterval(config.bulkFlushInterval).
 		Do(context.Background())
 	if err != nil {
 		return nil, err
