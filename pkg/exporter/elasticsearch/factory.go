@@ -2,6 +2,7 @@ package elasticsearch
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/open-telemetry/opentelemetry-collector/config/configerror"
 	"github.com/open-telemetry/opentelemetry-collector/config/configmodels"
@@ -12,10 +13,14 @@ import (
 const (
 	typeStr = "jaeger_elasticsearch"
 
-	defaultCreateTemplate = true
-	defaultServers        = "http://localhost:9200"
-	defaultShards         = 5
-	defaultReplicas       = 1
+	defaultCreateTemplate    = true
+	defaultServers           = "http://localhost:9200"
+	defaultShards            = 5
+	defaultReplicas          = 1
+	defaultBulkActions       = 1000
+	defaultBulkSizeBytes     = 5000000
+	defaultBulkWorkers       = 1
+	defaultBulkFlushInterval = 200 * time.Millisecond
 )
 
 // Factory is the factory for Jaeger Elasticsearch exporter.
@@ -30,10 +35,14 @@ func (Factory) Type() string {
 // CreateDefaultConfig returns default configuration of Factory.
 func (Factory) CreateDefaultConfig() configmodels.Exporter {
 	return &Config{
-		Servers:         defaultServers,
-		Replicas:        defaultReplicas,
-		Shards:          defaultShards,
-		CreateTemplates: defaultCreateTemplate,
+		Servers:           defaultServers,
+		Replicas:          defaultReplicas,
+		Shards:            defaultShards,
+		CreateTemplates:   defaultCreateTemplate,
+		bulkActions:       defaultBulkActions,
+		bulkSize:          defaultBulkSizeBytes,
+		bulkWorkers:       defaultBulkWorkers,
+		bulkFlushInterval: defaultBulkFlushInterval,
 	}
 }
 
