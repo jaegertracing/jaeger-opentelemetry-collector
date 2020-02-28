@@ -3,7 +3,6 @@ package elasticsearch
 import (
 	"context"
 	"strconv"
-	"strings"
 
 	eswrapper "github.com/jaegertracing/jaeger/pkg/es/wrapper"
 	"github.com/jaegertracing/jaeger/plugin/storage/es"
@@ -21,9 +20,8 @@ import (
 
 // New creates new Elasticsearch exporter/storage.
 func New(config *Config, log *zap.Logger) (exporter.TraceExporter, error) {
-	servers := strings.Split(config.Servers, ",")
 	esRawClient, err := elastic.NewClient(
-		elastic.SetURL(servers...),
+		elastic.SetURL(config.Servers...),
 		elastic.SetSniff(false))
 	if err != nil {
 		return nil, err
@@ -40,7 +38,7 @@ func New(config *Config, log *zap.Logger) (exporter.TraceExporter, error) {
 
 	version := config.Version
 	if version == 0 {
-		version, err = getVersion(esRawClient, servers[0])
+		version, err = getVersion(esRawClient, config.Servers[0])
 	}
 
 	w := esSpanStore.NewSpanWriter(esSpanStore.SpanWriterParams{
@@ -64,8 +62,6 @@ func New(config *Config, log *zap.Logger) (exporter.TraceExporter, error) {
 	return exporterhelper.NewTraceExporter(
 		config,
 		esStorage.store,
-		exporterhelper.WithTracing(true),
-		exporterhelper.WithMetrics(true),
 		exporterhelper.WithShutdown(func() error {
 			return w.Close()
 		}))
@@ -101,5 +97,5 @@ func (s *storage) store(ctx context.Context, td consumerdata.TraceData) (dropped
 			dropped++
 		}
 	}
-	return 0, nil
+	return dropped, nil
 }

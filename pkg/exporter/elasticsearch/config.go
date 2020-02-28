@@ -10,7 +10,7 @@ import (
 type Config struct {
 	configmodels.ExporterSettings `mapstructure:",squash"` // squash ensures fields are correctly decoded in embedded struct.
 	// Servers define Elasticsearch server URLs e.g. http://localhost:9200
-	Servers string `mapstructure:"server_urls"`
+	Servers []string `mapstructure:"server_urls"`
 	// Shards define number of primary shards
 	Shards uint `mapstructure:"shards"`
 	// Replicas define number of replica shards
