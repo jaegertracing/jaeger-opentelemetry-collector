@@ -37,8 +37,8 @@ func (f Factory) CreateDefaultConfig() configmodels.Exporter {
 	opts := f.Options()
 	return &Config{
 		Servers:           opts.GetPrimary().Servers,
-		Replicas:          uint(opts.GetPrimary().GetNumShards()),
-		Shards:            uint(opts.GetPrimary().GetNumReplicas()),
+		Shards:            uint(opts.GetPrimary().GetNumShards()),
+		Replicas:          uint(opts.GetPrimary().GetNumReplicas()),
 		IndexPrefix:       opts.GetPrimary().GetIndexPrefix(),
 		CreateTemplates:   opts.GetPrimary().IsCreateIndexTemplates(),
 		bulkActions:       opts.GetPrimary().BulkActions,
