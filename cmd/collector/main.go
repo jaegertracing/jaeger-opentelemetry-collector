@@ -3,6 +3,10 @@ package main
 import (
 	"log"
 
+	"github.com/jaegertracing/jaeger/pkg/config"
+	"github.com/jaegertracing/jaeger/plugin/storage/es"
+	"github.com/spf13/viper"
+
 	"github.com/jaegertracing/jaeger-opentelemetry-collector/pkg/exporter/elasticsearch"
 
 	"github.com/open-telemetry/opentelemetry-collector/defaults"
@@ -24,14 +28,23 @@ func main() {
 		//GitHash:  version.GitHash,
 	}
 
+	// TODO should we support jaeger conf file?
+	v := viper.New()
+
+	esExp := elasticsearch.Factory{Options: func() *es.Options {
+		opts := elasticsearch.CreateOptions()
+		opts.InitFromViper(v)
+		return opts
+	}}
 	cmpts, err := defaults.Components()
 	handleErr(err)
-
-	es := elasticsearch.Factory{}
-	cmpts.Exporters[es.Type()] = es
+	cmpts.Exporters[esExp.Type()] = esExp
 
 	svc, err := service.New(cmpts, info)
 	handleErr(err)
+
+	opts := elasticsearch.CreateOptions()
+	config.AddFlags(v, svc.Command(), opts.AddFlags)
 
 	err = svc.Start()
 	handleErr(err)

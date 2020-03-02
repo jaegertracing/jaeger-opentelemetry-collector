@@ -4,23 +4,38 @@ import (
 	"path"
 	"testing"
 
+	jConfig "github.com/jaegertracing/jaeger/pkg/config"
+	"github.com/jaegertracing/jaeger/plugin/storage/es"
+
 	"github.com/open-telemetry/opentelemetry-collector/config"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestDefaultConfig(t *testing.T) {
-	factory := &Factory{}
+	factory := &Factory{Options: func() *es.Options {
+		return CreateOptions()
+	}}
 	defaultCfg := factory.CreateDefaultConfig().(*Config)
-	assert.Equal(t, defaultServers, defaultCfg.Servers)
-	assert.Equal(t, defaultCreateTemplate, defaultCfg.CreateTemplates)
+	assert.Equal(t, []string{"http://127.0.0.1:9200"}, defaultCfg.Servers)
+	assert.Equal(t, true, defaultCfg.CreateTemplates)
 }
 
-func TestLoadConfig(t *testing.T) {
+func TestLoadConfigAndFlags(t *testing.T) {
 	factories, err := config.ExampleComponents()
 	require.NoError(t, err)
 
-	factory := &Factory{}
+	v, c := jConfig.Viperize(CreateOptions().AddFlags)
+	err = c.ParseFlags([]string{"--es.server-urls=bar", "--es.index-prefix=staging"})
+	require.NoError(t, err)
+
+	factory := &Factory{Options: func() *es.Options {
+		opts := CreateOptions()
+		opts.InitFromViper(v)
+		require.Equal(t, []string{"bar"}, opts.GetPrimary().Servers)
+		require.Equal(t, "staging", opts.GetPrimary().GetIndexPrefix())
+		return opts
+	}}
 	factories.Exporters[typeStr] = factory
 	cfg, err := config.LoadConfigFile(t, path.Join(".", "testdata", "config.yaml"), factories)
 	require.NoError(t, err)
@@ -29,6 +44,7 @@ func TestLoadConfig(t *testing.T) {
 	e1 := cfg.Exporters[typeStr]
 	esCfg := e1.(*Config)
 	assert.Equal(t, typeStr, esCfg.Name())
-	assert.Equal(t, "someUrl", esCfg.Servers)
+	assert.Equal(t, []string{"someUrl"}, esCfg.Servers)
 	assert.Equal(t, true, esCfg.CreateTemplates)
+	assert.Equal(t, "staging", esCfg.IndexPrefix)
 }

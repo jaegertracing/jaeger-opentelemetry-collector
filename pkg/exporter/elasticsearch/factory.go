@@ -2,8 +2,8 @@ package elasticsearch
 
 import (
 	"fmt"
-	"time"
 
+	"github.com/jaegertracing/jaeger/plugin/storage/es"
 	"github.com/open-telemetry/opentelemetry-collector/config/configerror"
 	"github.com/open-telemetry/opentelemetry-collector/config/configmodels"
 	"github.com/open-telemetry/opentelemetry-collector/exporter"
@@ -12,19 +12,19 @@ import (
 
 const (
 	typeStr = "jaeger_elasticsearch"
-
-	defaultCreateTemplate    = true
-	defaultServers           = "http://localhost:9200"
-	defaultShards            = 5
-	defaultReplicas          = 1
-	defaultBulkActions       = 1000
-	defaultBulkSizeBytes     = 5000000
-	defaultBulkWorkers       = 1
-	defaultBulkFlushInterval = 200 * time.Millisecond
 )
+
+// Options returns initialized es.Options structure.
+type Options func() *es.Options
+
+// CreateOptions creates Elasticsearch options supported by this exporter.
+func CreateOptions() *es.Options {
+	return es.NewOptions("es")
+}
 
 // Factory is the factory for Jaeger Elasticsearch exporter.
 type Factory struct {
+	Options Options
 }
 
 // Type gets the type of exporter.
@@ -33,16 +33,19 @@ func (Factory) Type() string {
 }
 
 // CreateDefaultConfig returns default configuration of Factory.
-func (Factory) CreateDefaultConfig() configmodels.Exporter {
+func (f Factory) CreateDefaultConfig() configmodels.Exporter {
+	opts := f.Options()
 	return &Config{
-		Servers:           defaultServers,
-		Replicas:          defaultReplicas,
-		Shards:            defaultShards,
-		CreateTemplates:   defaultCreateTemplate,
-		bulkActions:       defaultBulkActions,
-		bulkSize:          defaultBulkSizeBytes,
-		bulkWorkers:       defaultBulkWorkers,
-		bulkFlushInterval: defaultBulkFlushInterval,
+		Servers:           opts.GetPrimary().Servers,
+		Shards:            uint(opts.GetPrimary().GetNumShards()),
+		Replicas:          uint(opts.GetPrimary().GetNumReplicas()),
+		IndexPrefix:       opts.GetPrimary().GetIndexPrefix(),
+		CreateTemplates:   opts.GetPrimary().IsCreateIndexTemplates(),
+		bulkActions:       opts.GetPrimary().BulkActions,
+		bulkSize:          opts.GetPrimary().BulkSize,
+		bulkWorkers:       opts.GetPrimary().BulkWorkers,
+		bulkFlushInterval: opts.GetPrimary().BulkFlushInterval,
+		Version:           opts.GetPrimary().Version,
 	}
 }
 
