@@ -4,6 +4,8 @@ import (
 	"path"
 	"testing"
 
+	"github.com/jaegertracing/jaeger/cmd/flags"
+
 	jConfig "github.com/jaegertracing/jaeger/pkg/config"
 	"github.com/jaegertracing/jaeger/plugin/storage/es"
 
@@ -25,8 +27,8 @@ func TestLoadConfigAndFlags(t *testing.T) {
 	factories, err := config.ExampleComponents()
 	require.NoError(t, err)
 
-	v, c := jConfig.Viperize(CreateOptions().AddFlags)
-	err = c.ParseFlags([]string{"--es.server-urls=bar", "--es.index-prefix=staging"})
+	v, c := jConfig.Viperize(CreateOptions().AddFlags, flags.AddConfigFileFlag)
+	err = c.ParseFlags([]string{"--es.server-urls=bar", "--es.index-prefix=staging", "--config-file=./testdata/jaeger-config.yaml"})
 	require.NoError(t, err)
 
 	factory := &Factory{Options: func() *es.Options {
@@ -36,6 +38,10 @@ func TestLoadConfigAndFlags(t *testing.T) {
 		require.Equal(t, "staging", opts.GetPrimary().GetIndexPrefix())
 		return opts
 	}}
+
+	err = flags.TryLoadConfigFile(v)
+	require.NoError(t, err)
+
 	factories.Exporters[typeStr] = factory
 	cfg, err := config.LoadConfigFile(t, path.Join(".", "testdata", "config.yaml"), factories)
 	require.NoError(t, err)
@@ -47,4 +53,5 @@ func TestLoadConfigAndFlags(t *testing.T) {
 	assert.Equal(t, []string{"someUrl"}, esCfg.Servers)
 	assert.Equal(t, true, esCfg.CreateTemplates)
 	assert.Equal(t, "staging", esCfg.IndexPrefix)
+	assert.Equal(t, uint(100), esCfg.Shards)
 }

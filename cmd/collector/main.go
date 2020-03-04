@@ -1,16 +1,18 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"os"
 
+	"github.com/jaegertracing/jaeger/cmd/flags"
 	"github.com/jaegertracing/jaeger/pkg/config"
 	"github.com/jaegertracing/jaeger/plugin/storage/es"
+	"github.com/open-telemetry/opentelemetry-collector/defaults"
+	"github.com/open-telemetry/opentelemetry-collector/service"
 	"github.com/spf13/viper"
 
 	"github.com/jaegertracing/jaeger-opentelemetry-collector/pkg/exporter/elasticsearch"
-
-	"github.com/open-telemetry/opentelemetry-collector/defaults"
-	"github.com/open-telemetry/opentelemetry-collector/service"
 )
 
 func main() {
@@ -28,7 +30,6 @@ func main() {
 		//GitHash:  version.GitHash,
 	}
 
-	// TODO should we support jaeger conf file?
 	v := viper.New()
 
 	esExp := elasticsearch.Factory{Options: func() *es.Options {
@@ -43,8 +44,16 @@ func main() {
 	svc, err := service.New(cmpts, info)
 	handleErr(err)
 
+	cmd := svc.Command()
 	opts := elasticsearch.CreateOptions()
-	config.AddFlags(v, svc.Command(), opts.AddFlags)
+	config.AddFlags(v, cmd, opts.AddFlags, flags.AddConfigFileFlag)
+
+	// parse flags to propagate config file flag value to viper before service start
+	cmd.ParseFlags(os.Args)
+	err = flags.TryLoadConfigFile(v)
+	if err != nil {
+		handleErr(fmt.Errorf("could not load Jaeger configuration file %w", err))
+	}
 
 	err = svc.Start()
 	handleErr(err)
