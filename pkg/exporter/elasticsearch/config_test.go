@@ -31,16 +31,17 @@ func TestLoadConfigAndFlags(t *testing.T) {
 	err = c.ParseFlags([]string{"--es.server-urls=bar", "--es.index-prefix=staging", "--config-file=./testdata/jaeger-config.yaml"})
 	require.NoError(t, err)
 
+	err = flags.TryLoadConfigFile(v)
+	require.NoError(t, err)
+
 	factory := &Factory{Options: func() *es.Options {
 		opts := CreateOptions()
 		opts.InitFromViper(v)
 		require.Equal(t, []string{"bar"}, opts.GetPrimary().Servers)
 		require.Equal(t, "staging", opts.GetPrimary().GetIndexPrefix())
+		assert.Equal(t, int64(100), opts.GetPrimary().NumShards)
 		return opts
 	}}
-
-	err = flags.TryLoadConfigFile(v)
-	require.NoError(t, err)
 
 	factories.Exporters[typeStr] = factory
 	cfg, err := config.LoadConfigFile(t, path.Join(".", "testdata", "config.yaml"), factories)
