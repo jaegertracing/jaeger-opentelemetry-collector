@@ -16,3 +16,5 @@ require (
 )
 
 replace k8s.io/client-go => k8s.io/client-go v0.0.0-20190620085101-78d2af792bab
+
+replace github.com/open-telemetry/opentelemetry-collector => /home/ploffay/projects/opentelemetry/opentelemetry-collector
