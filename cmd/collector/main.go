@@ -49,14 +49,8 @@ func main() {
 	factories.Exporters[esExp.Type()] = esExp
 
 	var cfgFactory service.ConfigFactory
-	f := &flag.FlagSet{}
-	builder.Flags(f)
-	// parse flags to get file
-	f.Parse(os.Args)
-	file := builder.GetConfigFile()
-	if file == "" {
+	if getConfigFile() == "" {
 		log.Println("Config file not provided, installing default Jaeger components")
-		// TODO take into account flags when creating config objects
 		cfgFactory = func(*viper.Viper, config.Factories) (*configmodels.Config, error) {
 			return createConfig(factories), nil
 		}
@@ -82,6 +76,14 @@ func main() {
 
 	err = svc.Start()
 	handleErr(err)
+}
+
+func getConfigFile() string {
+	f := &flag.FlagSet{}
+	builder.Flags(f)
+	// parse flags to get file
+	f.Parse(os.Args)
+	return builder.GetConfigFile()
 }
 
 func createConfig(factories config.Factories) *configmodels.Config {
