@@ -2,6 +2,7 @@ package elasticsearch
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 
 	eswrapper "github.com/jaegertracing/jaeger/pkg/es/wrapper"
@@ -24,7 +25,7 @@ func New(config *Config, log *zap.Logger) (exporter.TraceExporter, error) {
 		elastic.SetURL(config.Servers...),
 		elastic.SetSniff(false))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create Elasticsearch client for %s, %v", config.Servers, err)
 	}
 	bulk, err := esRawClient.BulkProcessor().
 		BulkActions(config.bulkActions).

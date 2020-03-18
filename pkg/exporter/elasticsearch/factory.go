@@ -46,6 +46,10 @@ func (f Factory) CreateDefaultConfig() configmodels.Exporter {
 		bulkWorkers:       opts.GetPrimary().BulkWorkers,
 		bulkFlushInterval: opts.GetPrimary().BulkFlushInterval,
 		Version:           opts.GetPrimary().Version,
+		ExporterSettings: configmodels.ExporterSettings{
+			TypeVal: typeStr,
+			NameVal: typeStr,
+		},
 	}
 }
 
