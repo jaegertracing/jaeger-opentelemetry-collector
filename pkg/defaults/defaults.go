@@ -9,6 +9,7 @@ import (
 	"github.com/jaegertracing/jaeger-opentelemetry-collector/pkg/exporter/elasticsearch"
 )
 
+// Components creates default and Jaeger factories
 func Components(v *viper.Viper) (config.Factories, error) {
 	esExp := elasticsearch.Factory{Options: func() *es.Options {
 		opts := elasticsearch.CreateOptions()
