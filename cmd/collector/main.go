@@ -6,19 +6,18 @@ import (
 	"log"
 	"os"
 
+	"github.com/jaegertracing/jaeger-opentelemetry-collector/pkg/defaults"
+
 	"github.com/open-telemetry/opentelemetry-collector/config"
 	"github.com/open-telemetry/opentelemetry-collector/config/configmodels"
-	"github.com/open-telemetry/opentelemetry-collector/receiver"
-	"github.com/open-telemetry/opentelemetry-collector/receiver/jaegerreceiver"
 	"github.com/open-telemetry/opentelemetry-collector/service/builder"
 
 	jflags "github.com/jaegertracing/jaeger/cmd/flags"
 	jconfig "github.com/jaegertracing/jaeger/pkg/config"
-	"github.com/jaegertracing/jaeger/plugin/storage/es"
-	"github.com/open-telemetry/opentelemetry-collector/defaults"
 	"github.com/open-telemetry/opentelemetry-collector/service"
 	"github.com/spf13/viper"
 
+	"github.com/jaegertracing/jaeger-opentelemetry-collector/cmd/collector/app"
 	"github.com/jaegertracing/jaeger-opentelemetry-collector/pkg/exporter/elasticsearch"
 )
 
@@ -39,20 +38,14 @@ func main() {
 
 	v := viper.New()
 
-	esExp := elasticsearch.Factory{Options: func() *es.Options {
-		opts := elasticsearch.CreateOptions()
-		opts.InitFromViper(v)
-		return opts
-	}}
-	factories, err := defaults.Components()
+	factories, err := defaults.Components(v)
 	handleErr(err)
-	factories.Exporters[esExp.Type()] = esExp
 
 	var cfgFactory service.ConfigFactory
 	if getConfigFile() == "" {
 		log.Println("Config file not provided, installing default Jaeger components")
 		cfgFactory = func(*viper.Viper, config.Factories) (*configmodels.Config, error) {
-			return createConfig(factories), nil
+			return app.DefaultConfig(factories), nil
 		}
 	}
 
@@ -81,42 +74,7 @@ func main() {
 func getConfigFile() string {
 	f := &flag.FlagSet{}
 	builder.Flags(f)
-	// parse flags to get file
+	// parse flags to get the file
 	f.Parse(os.Args)
 	return builder.GetConfigFile()
-}
-
-func createConfig(factories config.Factories) *configmodels.Config {
-	cfg := &configmodels.Config{}
-	jRec := factories.Receivers["jaeger"].CreateDefaultConfig().(*jaegerreceiver.Config)
-	// TODO enable other protocols
-	jRec.Protocols["grpc"] = &receiver.SecureReceiverSettings{
-		ReceiverSettings: configmodels.ReceiverSettings{
-			Endpoint: "localhost:14250",
-		},
-	}
-	cfg.Receivers = map[string]configmodels.Receiver{
-		"jaeger": jRec,
-	}
-
-	esCfg := factories.Exporters["jaeger_elasticsearch"].CreateDefaultConfig()
-	cfg.Exporters = map[string]configmodels.Exporter{
-		"jaeger_elasticsearch": esCfg,
-	}
-
-	cfg.Processors = map[string]configmodels.Processor{
-		"batch": factories.Processors["batch"].CreateDefaultConfig(),
-	}
-
-	cfg.Service = configmodels.Service{
-		Pipelines: map[string]*configmodels.Pipeline{
-			"traces": {
-				InputType:  configmodels.TracesDataType,
-				Receivers:  []string{"jaeger"},
-				Exporters:  []string{"jaeger_elasticsearch"},
-				Processors: []string{"batch"},
-			},
-		},
-	}
-	return cfg
 }
