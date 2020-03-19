@@ -21,6 +21,22 @@ type Config struct {
 	CreateTemplates bool `mapstructure:"create_mappings"`
 	// IndexPrefix defines options prefix of Jaeger indices. For example "production" creates "production-jaeger-*"
 	IndexPrefix string `mapstructure:"index_prefix"`
+	// Configures ES client to uses sniffing process to find all nodes automatically
+	Sniffer bool `mapstructure:"sniffer"`
+	// Use aliases for to enable Elasticsearch Rollover
+	UseWriteAlias bool `mapstructure:"use_aliases"`
+
+	Password string `mapstructure:"password"`
+	Username string `mapstructure:"username"`
+	//Path to a file containing bearer token
+	TokenFile string `mapstructure:"toke_file"`
+
+	// Store all tags as object fields, instead nested objects
+	TagsAllAsFields bool `mapstructure:"tags_as_fields_all"`
+	// Dot replacement for tag keys when stored as object fields
+	TagsDotReplacement string `mapstructure:"tags_as_fields_dot_replacement"`
+	// File path to tag keys which should be stored as object fields
+	TagsFile string `mapstructure:"tag_as_fields_config_file"`
 
 	// BulkActions defines the number of requests that can be enqueued before the bulk processor decides to commit.
 	bulkActions int
