@@ -14,18 +14,16 @@ import (
 	eswrapper "github.com/jaegertracing/jaeger/pkg/es/wrapper"
 	"github.com/jaegertracing/jaeger/plugin/storage/es"
 	esSpanStore "github.com/jaegertracing/jaeger/plugin/storage/es/spanstore"
-	"github.com/jaegertracing/jaeger/storage/spanstore"
 	"github.com/olivere/elastic"
-	"github.com/open-telemetry/opentelemetry-collector/consumer/consumerdata"
-	"github.com/open-telemetry/opentelemetry-collector/consumer/consumererror"
 	"github.com/open-telemetry/opentelemetry-collector/exporter"
 	"github.com/open-telemetry/opentelemetry-collector/exporter/exporterhelper"
-	jaegertranslator "github.com/open-telemetry/opentelemetry-collector/translator/trace/jaeger"
 	"github.com/uber/jaeger-lib/metrics"
 	"go.uber.org/zap"
+
+	jexporter "github.com/jaegertracing/jaeger-opentelemetry-collector/pkg/exporter"
 )
 
-// New creates new Elasticsearch exporter/storage.
+// New creates Elasticsearch exporter/storage.
 func New(config *Config, log *zap.Logger) (exporter.TraceExporter, error) {
 	httpClient := &http.Client{}
 	options := []elastic.ClientOptionFunc{
@@ -90,12 +88,12 @@ func New(config *Config, log *zap.Logger) (exporter.TraceExporter, error) {
 		}
 	}
 
-	esStorage := &storage{
-		w: w,
+	storage := jexporter.Storage{
+		Writer: w,
 	}
 	return exporterhelper.NewTraceExporter(
 		config,
-		esStorage.store,
+		storage.Store,
 		exporterhelper.WithShutdown(func() error {
 			return w.Close()
 		}))
@@ -111,27 +109,6 @@ func getVersion(client *elastic.Client, server string) (uint, error) {
 		return 0, err
 	}
 	return uint(esVersion), nil
-}
-
-type storage struct {
-	w spanstore.Writer
-}
-
-func (s *storage) store(ctx context.Context, td consumerdata.TraceData) (droppedSpans int, err error) {
-	protoBatch, err := jaegertranslator.OCProtoToJaegerProto(td)
-	if err != nil {
-		return len(td.Spans), consumererror.Permanent(err)
-	}
-	dropped := 0
-	for _, span := range protoBatch.Spans {
-		span.Process = protoBatch.Process
-		err := s.w.WriteSpan(span)
-		// TODO should we wrap errors as we go and return?
-		if err != nil {
-			dropped++
-		}
-	}
-	return dropped, nil
 }
 
 func loadTagsFromFile(filePath string) ([]string, error) {

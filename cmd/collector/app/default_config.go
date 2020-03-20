@@ -1,6 +1,11 @@
 package app
 
 import (
+	"strings"
+
+	"github.com/jaegertracing/jaeger-opentelemetry-collector/pkg/exporter/cassandra"
+	"github.com/jaegertracing/jaeger-opentelemetry-collector/pkg/exporter/elasticsearch"
+
 	"github.com/open-telemetry/opentelemetry-collector/config"
 	"github.com/open-telemetry/opentelemetry-collector/config/configmodels"
 	"github.com/open-telemetry/opentelemetry-collector/processor/batchprocessor"
@@ -10,17 +15,22 @@ import (
 
 // DefaultConfig creates default configuration.
 // It enabled default Jaeger receivers, processors and exporters.
-func DefaultConfig(factories config.Factories) *configmodels.Config {
+func DefaultConfig(storageType string, factories config.Factories) *configmodels.Config {
+	exporters := createExporters(storageType, factories)
+	types := []string{}
+	for _, v := range exporters {
+		types = append(types, v.Type())
+	}
 	return &configmodels.Config{
 		Receivers:  createReceivers(factories),
-		Exporters:  createExporters(factories),
+		Exporters:  exporters,
 		Processors: createProcessors(factories),
 		Service: configmodels.Service{
 			Pipelines: map[string]*configmodels.Pipeline{
 				"traces": {
 					InputType:  configmodels.TracesDataType,
 					Receivers:  []string{"jaeger"},
-					Exporters:  []string{"jaeger_elasticsearch"},
+					Exporters:  types,
 					Processors: []string{"batch"},
 				},
 			},
@@ -58,11 +68,19 @@ func createReceivers(factories config.Factories) configmodels.Receivers {
 	}
 }
 
-func createExporters(factories config.Factories) configmodels.Exporters {
-	es := factories.Exporters["jaeger_elasticsearch"].CreateDefaultConfig()
-	return map[string]configmodels.Exporter{
-		"jaeger_elasticsearch": es,
+func createExporters(storageTypes string, factories config.Factories) configmodels.Exporters {
+	exporters := configmodels.Exporters{}
+	for _, storage := range strings.Split(storageTypes, ",") {
+		if storage == "elasticsearch" {
+			es := factories.Exporters[elasticsearch.TypeStr].CreateDefaultConfig()
+			exporters[elasticsearch.TypeStr] = es
+		}
+		if storage == "cassandra" {
+			cass := factories.Exporters[cassandra.TypeStr].CreateDefaultConfig()
+			exporters[cassandra.TypeStr] = cass
+		}
 	}
+	return exporters
 }
 
 func createProcessors(factories config.Factories) configmodels.Processors {

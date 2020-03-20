@@ -1,0 +1,18 @@
+receivers:
+  examplereceiver:
+
+processors:
+  exampleprocessor:
+
+exporters:
+  jaeger_cassandra:
+    servers: "first,second"
+    index:
+      tags: false
+
+service:
+  pipelines:
+    traces:
+      receivers: [examplereceiver]
+      processors: [exampleprocessor]
+      exporters: [jaeger_cassandra]

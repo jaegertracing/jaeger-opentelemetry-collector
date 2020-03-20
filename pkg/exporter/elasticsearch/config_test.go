@@ -47,14 +47,14 @@ func TestLoadConfigAndFlags(t *testing.T) {
 		return opts
 	}}
 
-	factories.Exporters[typeStr] = factory
-	cfg, err := config.LoadConfigFile(t, path.Join(".", "testdata", "config.yaml"), factories)
+	factories.Exporters[TypeStr] = factory
+	colConfig, err := config.LoadConfigFile(t, path.Join(".", "testdata", "config.yaml"), factories)
 	require.NoError(t, err)
-	require.NotNil(t, cfg)
+	require.NotNil(t, colConfig)
 
-	e1 := cfg.Exporters[typeStr]
+	e1 := colConfig.Exporters[TypeStr]
 	esCfg := e1.(*Config)
-	assert.Equal(t, typeStr, esCfg.Name())
+	assert.Equal(t, TypeStr, esCfg.Name())
 	assert.Equal(t, []string{"someUrl"}, esCfg.Servers)
 	assert.Equal(t, true, esCfg.CreateTemplates)
 	assert.Equal(t, "staging", esCfg.IndexPrefix)
