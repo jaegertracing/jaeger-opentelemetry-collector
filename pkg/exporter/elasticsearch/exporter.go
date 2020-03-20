@@ -64,8 +64,8 @@ func New(config *Config, log *zap.Logger) (exporter.TraceExporter, error) {
 		version, err = getVersion(esRawClient, config.Servers[0])
 	}
 	var tags []string
-	if config.TagsAllAsFields && config.TagsFile != "" {
-		tags, err = loadTagsFromFile(config.TagsFile)
+	if config.TagsAsFields.AllAsFields && config.TagsAsFields.File != "" {
+		tags, err = loadTagsFromFile(config.TagsAsFields.File)
 		if err != nil {
 			return nil, fmt.Errorf("failed to load tags file: %v", err)
 		}
@@ -77,9 +77,9 @@ func New(config *Config, log *zap.Logger) (exporter.TraceExporter, error) {
 		Client:              eswrapper.WrapESClient(esRawClient, bulk, version),
 		IndexPrefix:         config.IndexPrefix,
 		UseReadWriteAliases: config.UseWriteAlias,
-		AllTagsAsFields:     config.TagsAllAsFields,
+		AllTagsAsFields:     config.TagsAsFields.AllAsFields,
 		TagKeysAsFields:     tags,
-		TagDotReplacement:   config.TagsDotReplacement,
+		TagDotReplacement:   config.TagsAsFields.DotReplacement,
 	})
 
 	if config.CreateTemplates {

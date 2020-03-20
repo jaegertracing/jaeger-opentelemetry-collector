@@ -21,6 +21,10 @@ func TestDefaultConfig(t *testing.T) {
 	defaultCfg := factory.CreateDefaultConfig().(*Config)
 	assert.Equal(t, []string{"http://127.0.0.1:9200"}, defaultCfg.Servers)
 	assert.Equal(t, true, defaultCfg.CreateTemplates)
+	assert.Equal(t, false, defaultCfg.UseWriteAlias)
+	assert.Equal(t, false, defaultCfg.Sniffer)
+	assert.Equal(t, false, defaultCfg.TagsAsFields.AllAsFields)
+	assert.Equal(t, "@", defaultCfg.TagsAsFields.DotReplacement)
 }
 
 func TestLoadConfigAndFlags(t *testing.T) {
@@ -55,4 +59,12 @@ func TestLoadConfigAndFlags(t *testing.T) {
 	assert.Equal(t, true, esCfg.CreateTemplates)
 	assert.Equal(t, "staging", esCfg.IndexPrefix)
 	assert.Equal(t, uint(100), esCfg.Shards)
+	assert.Equal(t, "user", esCfg.Username)
+	assert.Equal(t, "pass", esCfg.Password)
+	assert.Equal(t, "/var/run/k8s", esCfg.TokenFile)
+	assert.Equal(t, true, esCfg.UseWriteAlias)
+	assert.Equal(t, true, esCfg.Sniffer)
+	assert.Equal(t, true, esCfg.TagsAsFields.AllAsFields)
+	assert.Equal(t, "/etc/jaeger", esCfg.TagsAsFields.File)
+	assert.Equal(t, "O", esCfg.TagsAsFields.DotReplacement)
 }
