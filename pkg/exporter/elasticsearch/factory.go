@@ -11,7 +11,8 @@ import (
 )
 
 const (
-	typeStr = "jaeger_elasticsearch"
+	// TypeStr defines type of the Elasticsearch exporter.
+	TypeStr = "jaeger_elasticsearch"
 )
 
 // Options returns initialized es.Options structure.
@@ -29,7 +30,7 @@ type Factory struct {
 
 // Type gets the type of exporter.
 func (Factory) Type() string {
-	return typeStr
+	return TypeStr
 }
 
 // CreateDefaultConfig returns default configuration of Factory.
@@ -58,8 +59,8 @@ func (f Factory) CreateDefaultConfig() configmodels.Exporter {
 		},
 
 		ExporterSettings: configmodels.ExporterSettings{
-			TypeVal: typeStr,
-			NameVal: typeStr,
+			TypeVal: TypeStr,
+			NameVal: TypeStr,
 		},
 	}
 }
@@ -68,7 +69,7 @@ func (f Factory) CreateDefaultConfig() configmodels.Exporter {
 func (Factory) CreateTraceExporter(log *zap.Logger, cfg configmodels.Exporter) (exporter.TraceExporter, error) {
 	esCfg, ok := cfg.(*Config)
 	if !ok {
-		return nil, fmt.Errorf("could not cast configuration to %s", typeStr)
+		return nil, fmt.Errorf("could not cast configuration to %s", TypeStr)
 	}
 	return New(esCfg, log)
 }
