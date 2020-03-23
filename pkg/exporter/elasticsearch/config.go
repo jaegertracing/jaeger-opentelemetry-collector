@@ -6,7 +6,7 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector/config/configmodels"
 )
 
-// Config hold configuration of Jaeger Elasticserch exporter/storage.
+// Config holds configuration of Jaeger Elasticserch exporter/storage.
 type Config struct {
 	configmodels.ExporterSettings `mapstructure:",squash"` // squash ensures fields are correctly decoded in embedded struct.
 	// Servers define Elasticsearch server URLs e.g. http://localhost:9200

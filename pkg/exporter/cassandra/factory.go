@@ -59,11 +59,11 @@ func (f Factory) CreateDefaultConfig() configmodels.Exporter {
 		Password:               cfg.Authenticator.Basic.Password,
 		Username:               cfg.Authenticator.Basic.Username,
 		Index: IndexConfig{
-			IndexLogs:        true,
-			IndexTags:        true,
-			IndexProcessTags: true,
-			TagBlackList:     nil,
-			TagWhiteList:     nil,
+			Logs:         true,
+			Tags:         true,
+			ProcessTags:  true,
+			TagBlackList: nil,
+			TagWhiteList: nil,
 		},
 		ExporterSettings: configmodels.ExporterSettings{
 			TypeVal: TypeStr,

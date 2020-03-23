@@ -40,10 +40,10 @@ func New(config *Config, log *zap.Logger) (exporter.TraceExporter, error) {
 	// TODO configure indexing
 	// make cassandra.Factory writeOptions public
 	spanWriter := spanstore.NewSpanWriter(session, config.SpanStoreWriteCacheTTL, metrics.NullFactory, zap.NewNop())
-	stoarge := jexporter.Storage{Writer: spanWriter}
+	storage := jexporter.Storage{Writer: spanWriter}
 	return exporterhelper.NewTraceExporter(
 		config,
-		stoarge.Store,
+		storage.Store,
 		exporterhelper.WithShutdown(func() error {
 			session.Close()
 			return nil

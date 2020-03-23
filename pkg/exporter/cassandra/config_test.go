@@ -25,9 +25,9 @@ func TestDefaultConfig(t *testing.T) {
 	assert.Equal(t, 4, defaultCfg.ProtocolVersion)
 	assert.Equal(t, time.Minute, defaultCfg.ReconnectInterval)
 	assert.Equal(t, defaultWriteCacheTTL, defaultCfg.SpanStoreWriteCacheTTL)
-	assert.Equal(t, true, defaultCfg.Index.IndexTags)
-	assert.Equal(t, true, defaultCfg.Index.IndexLogs)
-	assert.Equal(t, true, defaultCfg.Index.IndexProcessTags)
+	assert.Equal(t, true, defaultCfg.Index.Tags)
+	assert.Equal(t, true, defaultCfg.Index.Logs)
+	assert.Equal(t, true, defaultCfg.Index.ProcessTags)
 }
 
 func TestLoadConfigAndFlags(t *testing.T) {
@@ -56,6 +56,6 @@ func TestLoadConfigAndFlags(t *testing.T) {
 	cfg := colConfig.Exporters[TypeStr].(*Config)
 	assert.Equal(t, TypeStr, cfg.Name())
 	assert.Equal(t, []string{"first", "second"}, cfg.Servers)
-	assert.Equal(t, false, cfg.Index.IndexTags)
+	assert.Equal(t, false, cfg.Index.Tags)
 	assert.Equal(t, "my-keyspace", cfg.Keyspace)
 }
