@@ -46,6 +46,17 @@ func (f Factory) CreateDefaultConfig() configmodels.Exporter {
 		bulkWorkers:       opts.GetPrimary().BulkWorkers,
 		bulkFlushInterval: opts.GetPrimary().BulkFlushInterval,
 		Version:           opts.GetPrimary().Version,
+		Sniffer:           opts.GetPrimary().Sniffer,
+		UseWriteAlias:     opts.GetPrimary().UseReadWriteAliases,
+		Username:          opts.GetPrimary().Username,
+		Password:          opts.GetPrimary().Password,
+		TokenFile:         opts.GetPrimary().TokenFilePath,
+		TagsAsFields: TagsAsFields{
+			AllAsFields:    opts.GetPrimary().AllTagsAsFields,
+			DotReplacement: opts.GetPrimary().TagDotReplacement,
+			File:           opts.GetPrimary().TagsFilePath,
+		},
+
 		ExporterSettings: configmodels.ExporterSettings{
 			TypeVal: typeStr,
 			NameVal: typeStr,
