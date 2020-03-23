@@ -57,4 +57,5 @@ func TestLoadConfigAndFlags(t *testing.T) {
 	assert.Equal(t, TypeStr, cfg.Name())
 	assert.Equal(t, []string{"first", "second"}, cfg.Servers)
 	assert.Equal(t, false, cfg.Index.IndexTags)
+	assert.Equal(t, "my-keyspace", cfg.Keyspace)
 }

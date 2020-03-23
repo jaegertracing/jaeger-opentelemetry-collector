@@ -1,2 +1,2 @@
-es:
-  num-shards: 100
+cassandra:
+  keyspace: my-keyspace
