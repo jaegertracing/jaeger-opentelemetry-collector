@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	jflags "github.com/jaegertracing/jaeger/cmd/flags"
 	jconfig "github.com/jaegertracing/jaeger/pkg/config"
@@ -92,12 +93,20 @@ func getConfigFile() string {
 }
 
 func storageFlags(storage string) (func(*flag.FlagSet), error) {
-	switch storage {
-	case "cassandra":
-		return cassandra.CreateOptions().AddFlags, nil
-	case "elasticsearch":
-		return elasticsearch.CreateOptions().AddFlags, nil
-	default:
-		return nil, fmt.Errorf("unknown storage type: %s", storage)
+	var flagFn []func(*flag.FlagSet)
+	for _, s := range strings.Split(storage, ",") {
+		switch s {
+		case "cassandra":
+			flagFn = append(flagFn, cassandra.CreateOptions().AddFlags)
+		case "elasticsearch":
+			flagFn = append(flagFn, elasticsearch.CreateOptions().AddFlags)
+		default:
+			return nil, fmt.Errorf("unknown storage type: %s", s)
+		}
 	}
+	return func(flagSet *flag.FlagSet) {
+		for _, f := range flagFn {
+			f(flagSet)
+		}
+	}, nil
 }
