@@ -3,6 +3,10 @@ module github.com/jaegertracing/jaeger-opentelemetry-collector
 go 1.13
 
 require (
+	github.com/jaegertracing/opentelemetry-collector-contrib/exporter/elasticsearch v0.49.0
+)
+
+require (
 	github.com/hashicorp/go-hclog v0.12.1 // indirect
 	github.com/hashicorp/go-plugin v1.2.0 // indirect
 	github.com/jaegertracing/jaeger v1.17.1-0.20200319151430-7304d868c02d
@@ -16,4 +20,4 @@ require (
 	go.uber.org/zap v1.13.0
 )
 
-replace k8s.io/client-go => k8s.io/client-go v0.0.0-20190620085101-78d2af792bab
+replace github.com/jaegertracing/jaeger-opentelemetry-collector/exporter/elasticsearch => ./exporter/elasticsearch

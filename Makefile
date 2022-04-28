@@ -1,4 +1,11 @@
-UNIT_TEST_PACKAGES := $(shell go list ./pkg/...)
+ALL_SRC := $(shell find . -name '*.go' \
+                                -not -path '*/third_party/*' \
+                                -type f | sort)
+
+# ALL_PKGS is used with 'go cover'
+ALL_PKGS := $(shell $(GOCMD) list $(sort $(dir $(ALL_SRC))) 2>/dev/null)
+
+UNIT_TEST_PACKAGES := $(shell go list ./...)
 GO_FLAGS ?= GOOS=linux GOARCH=amd64 CGO_ENABLED=0 GO111MODULE=on
 FMT_LOG=fmt.log
 LINT_LOG=lint.log
@@ -11,7 +18,7 @@ DOCKER_TAG ?= latest
 
 .PHONY: test
 test:
-	go test $(UNIT_TEST_PACKAGES) -cover -coverprofile=cover.out
+	go test $(ALL_PKGS) -cover -coverprofile=cover.out
 
 .PHONY: ci
 ci: check test
@@ -34,13 +41,3 @@ install-tools:
 	${GO_FLAGS} go install \
 		golang.org/x/lint/golint \
 		golang.org/x/tools/cmd/goimports
-
-################## Build
-
-.PHONY: build
-build:
-	${GO_FLAGS} go build -o ./cmd/collector/$(COLLECTOR_NAME) cmd/collector/main.go
-
-.PHONY: docker
-docker:
-	docker build . --file cmd/collector/Dockerfile -t $(DOCKER_NAMESPACE)/$(COLLECTOR_NAME):$(DOCKER_TAG)
