@@ -1,6 +1,6 @@
 module github.com/jaegertracing/jaeger-opentelemetry-collector
 
-go 1.13
+go 1.17
 
 require (
 	github.com/jaegertracing/opentelemetry-collector-contrib/exporter/elasticsearch v0.49.0
