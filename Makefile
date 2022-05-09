@@ -4,9 +4,7 @@ RUN_CONFIG?=local/config.yaml
 CMD?=
 OTEL_VERSION=main
 
-BUILD_INFO_IMPORT_PATH=github.com/open-telemetry/opentelemetry-collector-contrib/internal/version
-VERSION=$(shell git describe --always --match "v[0-9]*" HEAD)
-BUILD_INFO=-ldflags "-X $(BUILD_INFO_IMPORT_PATH).Version=$(VERSION)"
+BUILD_INFO=-ldflags ""
 
 COMP_REL_PATH=internal/components/components.go
 MOD_NAME=github.com/open-telemetry/opentelemetry-collector-contrib
@@ -159,7 +157,7 @@ install-tools:
 
 .PHONY: run
 run:
-	GO111MODULE=on $(GOCMD) run --race ./cmd/otelcontribcol/... --config ${RUN_CONFIG} ${RUN_ARGS}
+	GO111MODULE=on $(GOCMD) run --race ./cmd/jaegercol/... --config ${RUN_CONFIG} ${RUN_ARGS}
 
 .PHONY: docker-component # Not intended to be used directly
 docker-component: check-component
@@ -174,54 +172,21 @@ ifndef COMPONENT
 	$(error COMPONENT variable was not defined)
 endif
 
-.PHONY: docker-otelcontribcol
-docker-otelcontribcol:
-	COMPONENT=otelcontribcol $(MAKE) docker-component
-
 .PHONY: generate
 generate:
 	cd cmd/mdatagen && $(GOCMD) install .
 	$(MAKE) for-all CMD="$(GOCMD) generate ./..."
 
 # Build the Collector executable.
-.PHONY: otelcontribcol
-otelcontribcol:
-	GO111MODULE=on CGO_ENABLED=0 $(GOCMD) build -trimpath -o ./bin/otelcontribcol_$(GOOS)_$(GOARCH)$(EXTENSION) \
-		$(BUILD_INFO) -tags $(GO_BUILD_TAGS) ./cmd/otelcontribcol
-
-# Build the Collector executable, including unstable functionality.
-.PHONY: otelcontribcol-unstable
-otelcontribcol-unstable:
-	GO111MODULE=on CGO_ENABLED=0 $(GOCMD) build -trimpath -o ./bin/otelcontribcol_unstable_$(GOOS)_$(GOARCH)$(EXTENSION) \
-		$(BUILD_INFO) -tags $(GO_BUILD_TAGS),enable_unstable ./cmd/otelcontribcol
-
-.PHONY: otelcontribcol-all-sys
-otelcontribcol-all-sys: otelcontribcol-darwin_amd64 otelcontribcol-darwin_arm64 otelcontribcol-linux_amd64 otelcontribcol-linux_arm64 otelcontribcol-windows_amd64
-
-.PHONY: otelcontribcol-darwin_amd64
-otelcontribcol-darwin_amd64:
-	GOOS=darwin  GOARCH=amd64 $(MAKE) otelcontribcol
-
-.PHONY: otelcontribcol-darwin_arm64
-otelcontribcol-darwin_arm64:
-	GOOS=darwin  GOARCH=arm64 $(MAKE) otelcontribcol
-
-.PHONY: otelcontribcol-linux_amd64
-otelcontribcol-linux_amd64:
-	GOOS=linux   GOARCH=amd64 $(MAKE) otelcontribcol
-
-.PHONY: otelcontribcol-linux_arm64
-otelcontribcol-linux_arm64:
-	GOOS=linux   GOARCH=arm64 $(MAKE) otelcontribcol
-
-.PHONY: otelcontribcol-windows_amd64
-otelcontribcol-windows_amd64:
-	GOOS=windows GOARCH=amd64 EXTENSION=.exe $(MAKE) otelcontribcol
+.PHONY: jaegercol
+jaegercol:
+	GO111MODULE=on CGO_ENABLED=0 $(GOCMD) build -trimpath -o ./bin/jaegercol_$(GOOS)_$(GOARCH)$(EXTENSION) \
+		$(BUILD_INFO) -tags $(GO_BUILD_TAGS) ./cmd/jaegercol
 
 .PHONY: update-dep
 update-dep:
 	$(MAKE) for-all-target TARGET="updatedep"
-	$(MAKE) otelcontribcol
+	$(MAKE) jaegercol
 
 .PHONY: update-otel
 update-otel:
