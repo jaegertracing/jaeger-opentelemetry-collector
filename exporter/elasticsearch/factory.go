@@ -21,7 +21,9 @@ func NewFactory() component.ExporterFactory {
 }
 
 func createDefaultConfig() config.Exporter {
-	return &Config{}
+	return &Config{
+		ExporterSettings: config.NewExporterSettings(config.NewComponentID(typeStr)),
+	}
 }
 
 func createTracesExporter(
