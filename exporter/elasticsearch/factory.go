@@ -9,7 +9,8 @@ import (
 
 const (
 	// The value of "type" key in configuration.
-	typeStr = "elasticsearch"
+	typeStr   = "elasticsearch"
+	stability = component.StabilityLevelInDevelopment
 )
 
 // NewFactory creates a factory for Jaeger exporter
@@ -17,7 +18,7 @@ func NewFactory() component.ExporterFactory {
 	return component.NewExporterFactory(
 		typeStr,
 		createDefaultConfig,
-		component.WithTracesExporter(createTracesExporter))
+		component.WithTracesExporter(createTracesExporter, stability))
 }
 
 func createDefaultConfig() config.Exporter {
