@@ -11,6 +11,7 @@ import (
 	"go.opentelemetry.io/collector/processor/memorylimiterprocessor"
 	"go.opentelemetry.io/collector/receiver/otlpreceiver"
 
+	"github.com/jaegertracing/jaeger-opentelemetry-collector/exporter/cassandra"
 	"github.com/jaegertracing/jaeger-opentelemetry-collector/exporter/elasticsearch"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/jaegerexporter"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/jaegerthrifthttpexporter"
@@ -53,6 +54,7 @@ func Components() (component.Factories, error) {
 	}
 
 	exporters := []component.ExporterFactory{
+		cassandra.NewFactory(),
 		elasticsearch.NewFactory(),
 		jaegerexporter.NewFactory(),
 		jaegerthrifthttpexporter.NewFactory(),

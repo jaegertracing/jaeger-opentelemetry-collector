@@ -4,9 +4,12 @@ go 1.17
 
 require github.com/jaegertracing/jaeger-opentelemetry-collector/exporter/elasticsearch v0.49.0
 
+require github.com/jaegertracing/jaeger-opentelemetry-collector/exporter/cassandra v0.49.0
+
 require go.opentelemetry.io/collector v0.59.0
 
 require (
+	github.com/jaegertracing/jaeger v1.37.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/jaegerexporter v0.59.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/jaegerthrifthttpexporter v0.59.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/kafkaexporter v0.59.0
@@ -22,6 +25,7 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/opencensusreceiver v0.59.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/receiver/zipkinreceiver v0.59.0
 	github.com/stretchr/testify v1.8.0
+	go.opencensus.io v0.23.0
 )
 
 require (
@@ -61,6 +65,7 @@ require (
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/jsonreference v0.20.0 // indirect
 	github.com/go-openapi/swag v0.21.1 // indirect
+	github.com/gocql/gocql v0.0.0-20211222173705-d73e6b1002a7 // indirect
 	github.com/gogo/googleapis v1.4.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
@@ -73,6 +78,7 @@ require (
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0 // indirect
+	github.com/hailocab/go-hostpool v0.0.0-20160125115350-e80d13ce29ed // indirect
 	github.com/hashicorp/consul/api v1.14.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
@@ -85,7 +91,6 @@ require (
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/hashicorp/serf v0.9.7 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
-	github.com/jaegertracing/jaeger v1.37.0 // indirect
 	github.com/jcmturner/aescts/v2 v2.0.0 // indirect
 	github.com/jcmturner/dnsutils/v2 v2.0.0 // indirect
 	github.com/jcmturner/gofork v1.7.6 // indirect
@@ -156,7 +161,6 @@ require (
 	github.com/xdg-go/scram v1.1.1 // indirect
 	github.com/xdg-go/stringprep v1.0.3 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
-	go.opencensus.io v0.23.0 // indirect
 	go.opentelemetry.io/collector/pdata v0.59.0 // indirect
 	go.opentelemetry.io/collector/semconv v0.59.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.34.0 // indirect
@@ -199,3 +203,5 @@ require (
 )
 
 replace github.com/jaegertracing/jaeger-opentelemetry-collector/exporter/elasticsearch => ./exporter/elasticsearch
+
+replace github.com/jaegertracing/jaeger-opentelemetry-collector/exporter/cassandra => ./exporter/cassandra
