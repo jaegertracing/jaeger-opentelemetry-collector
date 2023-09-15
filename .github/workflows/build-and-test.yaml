@@ -1,8 +1,8 @@
-name: "Basic checks"
+name: "Build and test"
 on: [push, pull_request]
 
 jobs:
-  basic-checks:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/setup-go@v3
