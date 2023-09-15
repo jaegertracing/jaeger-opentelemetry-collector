@@ -7,6 +7,17 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    groups:
+      otel:
+        patterns:
+          - "go.opentelemetry.io/otel*"
+      otel-collector:
+        patterns:
+          - "go.opentelemetry.io/collector*"
+          - "github.com/open-telemetry/o*-collector-contrib/*"
+      otel-instrumentation:
+        patterns:
+          - "go.opentelemetry.io/contrib/instrumentation/*"
 
   - package-ecosystem: "github-actions"
     directory: "/"
