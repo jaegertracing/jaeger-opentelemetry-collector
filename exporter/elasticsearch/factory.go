@@ -4,34 +4,34 @@ import (
 	"context"
 
 	"go.opentelemetry.io/collector/component"
-	"go.opentelemetry.io/collector/config"
+	"go.opentelemetry.io/collector/exporter"
 )
 
 const (
 	// The value of "type" key in configuration.
 	typeStr   = "elasticsearch"
-	stability = component.StabilityLevelInDevelopment
+	stability = component.StabilityLevelAlpha
 )
 
 // NewFactory creates a factory for Jaeger exporter
-func NewFactory() component.ExporterFactory {
-	return component.NewExporterFactory(
+func NewFactory() exporter.Factory {
+	return exporter.NewFactory(
 		typeStr,
 		createDefaultConfig,
-		component.WithTracesExporter(createTracesExporter, stability))
+		exporter.WithTraces(createTracesExporter, stability))
 }
 
-func createDefaultConfig() config.Exporter {
+func createDefaultConfig() component.Config {
 	return &Config{
-		ExporterSettings: config.NewExporterSettings(config.NewComponentID(typeStr)),
+		// ExporterSettings: component.NewExporterSettings(component.NewID(typeStr)),
 	}
 }
 
 func createTracesExporter(
-	_ context.Context,
-	set component.ExporterCreateSettings,
-	config config.Exporter,
-) (component.TracesExporter, error) {
-	expCfg := config.(*Config)
+	ctx context.Context,
+	set exporter.CreateSettings,
+	cfg component.Config,
+) (exporter.Traces, error) {
+	expCfg := cfg.(*Config)
 	return newTracesExporter(expCfg, set)
 }

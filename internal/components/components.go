@@ -1,14 +1,20 @@
 package components // import "github.com/open-telemetry/opentelemetry-collector-contrib/internal/components"
 
 import (
-	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/connector"
+	forwardconnector "go.opentelemetry.io/collector/connector/forwardconnector"
+	"go.opentelemetry.io/collector/exporter"
 	"go.opentelemetry.io/collector/exporter/loggingexporter"
 	"go.opentelemetry.io/collector/exporter/otlpexporter"
 	"go.opentelemetry.io/collector/exporter/otlphttpexporter"
+	"go.opentelemetry.io/collector/extension"
 	"go.opentelemetry.io/collector/extension/ballastextension"
 	"go.opentelemetry.io/collector/extension/zpagesextension"
+	"go.opentelemetry.io/collector/otelcol"
+	"go.opentelemetry.io/collector/processor"
 	"go.opentelemetry.io/collector/processor/batchprocessor"
 	"go.opentelemetry.io/collector/processor/memorylimiterprocessor"
+	"go.opentelemetry.io/collector/receiver"
 	"go.opentelemetry.io/collector/receiver/otlpreceiver"
 
 	"github.com/jaegertracing/jaeger-opentelemetry-collector/exporter/elasticsearch"
@@ -24,62 +30,73 @@ import (
 	"github.com/open-telemetry/opentelemetry-collector-contrib/processor/spanprocessor"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/jaegerreceiver"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/kafkareceiver"
-	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/opencensusreceiver"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/zipkinreceiver"
 )
 
-func Components() (component.Factories, error) {
+func Components() (otelcol.Factories, error) {
 	var err error
-	factories := component.Factories{}
-	extensions := []component.ExtensionFactory{
+	factories := otelcol.Factories{}
+
+	factories.Extensions, err = extension.MakeFactoryMap(
+		// standard
 		ballastextension.NewFactory(),
 		zpagesextension.NewFactory(),
-	}
-	factories.Extensions, err = component.MakeExtensionFactoryMap(extensions...)
+		// add-ons
+	)
 	if err != nil {
-		return component.Factories{}, err
+		return otelcol.Factories{}, err
 	}
 
-	receivers := []component.ReceiverFactory{
+	factories.Receivers, err = receiver.MakeFactoryMap(
+		// standard
+		otlpreceiver.NewFactory(),
+		// add-ons
 		jaegerreceiver.NewFactory(),
 		kafkareceiver.NewFactory(),
-		opencensusreceiver.NewFactory(),
-		otlpreceiver.NewFactory(),
 		zipkinreceiver.NewFactory(),
-	}
-	factories.Receivers, err = component.MakeReceiverFactoryMap(receivers...)
+	)
 	if err != nil {
-		return component.Factories{}, err
+		return otelcol.Factories{}, err
 	}
 
-	exporters := []component.ExporterFactory{
+	factories.Exporters, err = exporter.MakeFactoryMap(
+		// standard
+		loggingexporter.NewFactory(),
+		otlpexporter.NewFactory(),
+		otlphttpexporter.NewFactory(),
+		// add-ons
 		elasticsearch.NewFactory(),
 		jaegerexporter.NewFactory(),
 		jaegerthrifthttpexporter.NewFactory(),
 		kafkaexporter.NewFactory(),
-		loggingexporter.NewFactory(),
-		otlpexporter.NewFactory(),
-		otlphttpexporter.NewFactory(),
 		prometheusexporter.NewFactory(),
 		zipkinexporter.NewFactory(),
-	}
-	factories.Exporters, err = component.MakeExporterFactoryMap(exporters...)
+	)
 	if err != nil {
-		return component.Factories{}, err
+		return otelcol.Factories{}, err
 	}
 
-	processors := []component.ProcessorFactory{
-		attributesprocessor.NewFactory(),
+	factories.Processors, err = processor.MakeFactoryMap(
+		// standard
 		batchprocessor.NewFactory(),
 		memorylimiterprocessor.NewFactory(),
+		// add-ons
+		attributesprocessor.NewFactory(),
 		resourcedetectionprocessor.NewFactory(),
 		resourceprocessor.NewFactory(),
 		spanmetricsprocessor.NewFactory(),
 		spanprocessor.NewFactory(),
-	}
-	factories.Processors, err = component.MakeProcessorFactoryMap(processors...)
+	)
 	if err != nil {
-		return component.Factories{}, err
+		return otelcol.Factories{}, err
+	}
+
+	factories.Connectors, err = connector.MakeFactoryMap(
+		// standard
+		forwardconnector.NewFactory(),
+	)
+	if err != nil {
+		return otelcol.Factories{}, err
 	}
 
 	return factories, nil

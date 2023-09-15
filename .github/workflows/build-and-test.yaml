@@ -1,16 +1,19 @@
-name: "Basic checks"
+name: "Build and test"
 on: [push, pull_request]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ (github.event.pull_request && github.event.pull_request.number) || github.ref || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
-  basic-checks:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/setup-go@v3
       with:
-        go-version: '1.18'
+        go-version: '1.21'
 
     - uses: actions/checkout@v3
 
     - name: "run test in all go modules"
       run: make gotest
-
