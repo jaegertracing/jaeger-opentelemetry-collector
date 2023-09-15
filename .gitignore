@@ -21,3 +21,5 @@ bin/
 
 /config.yaml
 cmd/collector/jaeger-opentelemetry-collector
+
+go.work
